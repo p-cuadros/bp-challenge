@@ -18,7 +18,7 @@ spec:
       - name: bp-challenge
         image: appscr.azurecr.io/bp-challenge
         ports:
-        - containerPort: 5000
+        - containerPort: 80
         env:
         - name: API_KEY
           value: "2f5ae96c-b558-4c7b-a590-a501ae1c3f6c"
