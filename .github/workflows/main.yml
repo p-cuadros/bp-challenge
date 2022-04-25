@@ -26,7 +26,6 @@ jobs:
             -Dsonar.organization=p-cuadros
             -Dsonar.projectKey=bp-challenge
             -Dsonar.python.coverage.reportPaths=coverage.xml
-          
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -39,23 +38,23 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
     - name: Container build and push to a Azure Container registry (ACR)
-    - run: |
+      run: |
         docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/bp-challenge:${{ github.sha }}
         docker push ${{ env.REGISTRY_NAME }}.azurecr.io/bp-challenge:${{ github.sha }}
     
     - name: Set the target Azure Kubernetes Service (AKS) cluster. 
-    - uses: azure/aks-set-context@v1
+      uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
         cluster-name: ${{ env.CLUSTER_NAME }}
         resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
     
     - name: Create namespace if doesn't exist
-    - run: |
+      run: |
         kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
     
     - name: Create image pull secret for Azure Container registry (ACR)
-    - uses: azure/k8s-create-secret@v1
+      uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
@@ -64,7 +63,7 @@ jobs:
         namespace: ${{ env.NAMESPACE }}
     
     - name: Deploy app to AKS
-    - uses: azure/k8s-deploy@v1
+      uses: azure/k8s-deploy@v1
       with:
         manifests: |
           manifests/aks_app.yaml
