@@ -27,8 +27,8 @@ jobs:
             -Dsonar.organization=p-cuadros
             -Dsonar.projectKey=bp-challenge
             -Dsonar.python.coverage.reportPaths=coverage.xml
-            -Dsonar.sources=src/
-            -Dsonar.test.exclusions=tests/**
+          #  -Dsonar.sources=src/
+          #  -Dsonar.test.exclusions=tests/**
           # -Dsonar.tests=tests/
           # -Dsonar.verbose=true            
       env:
