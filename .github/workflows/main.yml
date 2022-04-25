@@ -1,6 +1,5 @@
 on: [push]
 
-# Environment variables available to all jobs and steps in this workflow
 env:
   REGISTRY_NAME: appscr
   CLUSTER_NAME: appsaks
@@ -19,7 +18,7 @@ jobs:
     - name: Run unit tests
       run: pytest --cov=src tests/ --cov-report=xml
 
-    - name: SonarCloud Scan
+    - name: Scan Quality with SonarCloud
       uses: sonarsource/sonarcloud-github-action@master
       with:
           projectBaseDir: src
@@ -27,38 +26,35 @@ jobs:
             -Dsonar.organization=p-cuadros
             -Dsonar.projectKey=bp-challenge
             -Dsonar.python.coverage.reportPaths=coverage.xml
-          #  -Dsonar.sources=src/
-          #  -Dsonar.test.exclusions=tests/**
-          # -Dsonar.tests=tests/
-          # -Dsonar.verbose=true            
+          
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     
-    # Connect to Azure Container registry (ACR)
-    - uses: azure/docker-login@v1
+    - name: Connect to Azure Container registry (ACR)
+      uses: azure/docker-login@v1
       with:
         login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }} 
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
-    # Container build and push to a Azure Container registry (ACR)
+    - name: Container build and push to a Azure Container registry (ACR)
     - run: |
         docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/bp-challenge:${{ github.sha }}
         docker push ${{ env.REGISTRY_NAME }}.azurecr.io/bp-challenge:${{ github.sha }}
     
-    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - name: Set the target Azure Kubernetes Service (AKS) cluster. 
     - uses: azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
         cluster-name: ${{ env.CLUSTER_NAME }}
         resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
     
-    # Create namespace if doesn't exist
+    - name: Create namespace if doesn't exist
     - run: |
         kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
     
-    # Create image pull secret for Azure Container registry (ACR)
+    - name: Create image pull secret for Azure Container registry (ACR)
     - uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
@@ -67,7 +63,7 @@ jobs:
         secret-name: ${{ env.REGISTRY_NAME }}-registry-connection
         namespace: ${{ env.NAMESPACE }}
     
-    # Deploy app to AKS
+    - name: Deploy app to AKS
     - uses: azure/k8s-deploy@v1
       with:
         manifests: |

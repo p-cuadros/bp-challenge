@@ -53,7 +53,6 @@ def message_devops():
         req =  request.get_json()
         response_body = {
             "message": "Hello " + req.get("to") + " your message will be send.",
-
         }
         res = make_response(jsonify(response_body), 200)
         return res
