@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bp-challenge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bp-challenge
+  template:
+    metadata:
+      labels:
+        app: bp-challenge
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: bp-challenge
+        image: appscr.azurecr.io/bp-challenge
+        ports:
+        - containerPort: 5000
+          name: redis
+        env:
+        - name: X-Parse-REST-API-Key
+          value: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bp-challenge
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+  selector:
+    app: bp-challenge
