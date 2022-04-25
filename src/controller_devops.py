@@ -1,7 +1,6 @@
 from flask import Flask, make_response, request,jsonify
 from authlib.jose import jwt
 from __init__ import app
-# from __init__ import csrf 
 from functools import wraps
 from datetime import datetime
 
@@ -49,7 +48,6 @@ def get_token():
 @app.route('/DevOps', methods=['POST'])
 @requireTokenJWT
 @requireAPIkey
-# @csrf.exempt
 def message_devops():
     if request.is_json:
         req =  request.get_json()
