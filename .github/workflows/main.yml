@@ -2,9 +2,9 @@ on: [push]
 
 # Environment variables available to all jobs and steps in this workflow
 env:
-  REGISTRY_NAME: actionsaksacr
-  CLUSTER_NAME: actionsakscluster
-  CLUSTER_RESOURCE_GROUP: actionsaks
+  REGISTRY_NAME: appscr
+  CLUSTER_NAME: appsaks
+  CLUSTER_RESOURCE_GROUP: apps_rg
   NAMESPACE: default
   
 jobs:
