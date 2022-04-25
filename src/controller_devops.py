@@ -1,27 +1,28 @@
 from flask import Flask, make_response, request,jsonify
 from authlib.jose import jwt
-from __init__ import app 
+from __init__ import app
+# from __init__ import csrf 
 from functools import wraps
 from datetime import datetime
 
-def generate_token():
+def generateToken():
     return jwt.encode(
         {'alg': 'RS256'},
         {'iat': datetime.utcnow(), 'API_KEY': app.config['API_KEY']},
         app.config.get('PRIVATE_KEY')
     ).decode()
 
-def decode_token(token):
+def decodeToken(token):
     try:
         return jwt.decode(token, app.config.get('PUBLIC_KEY'))
     except:
         return None
 
 
-def require_tokenJWT(view_function):
+def requireTokenJWT(view_function):
     @wraps(view_function)
     def decorated_function(*args, **kwargs):
-        token = decode_token(request.headers.get("X-JWT-KWY"))
+        token = decodeToken(request.headers.get("X-JWT-KWY"))
         if token:
             return view_function(*args, **kwargs)
         else:
@@ -30,7 +31,7 @@ def require_tokenJWT(view_function):
     return decorated_function
 
 
-def require_APIkey(view_function):
+def requireAPIkey(view_function):
     def decorated_function(*args, **kwargs):
         if (request.headers.get("X-Parse-REST-API-Key") == app.config['API_KEY']):
             return view_function(*args, **kwargs)
@@ -41,13 +42,14 @@ def require_APIkey(view_function):
 
 @app.route('/get_token', methods=['GET'])
 def get_token():
-    token = generate_token()
+    token = generateToken()
     return jsonify({'token': token})
 
 
 @app.route('/DevOps', methods=['POST'])
-@require_tokenJWT
-@require_APIkey
+@requireTokenJWT
+@requireAPIkey
+# @csrf.exempt
 def message_devops():
     if request.is_json:
         req =  request.get_json()

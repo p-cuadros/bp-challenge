@@ -2,3 +2,4 @@ flask
 gunicorn
 pycryptodome
 Authlib
+flask_wtf
