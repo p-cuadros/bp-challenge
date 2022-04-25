@@ -3,3 +3,5 @@ gunicorn
 pycryptodome
 Authlib
 flask_wtf
+pytest
+pytest-cov
